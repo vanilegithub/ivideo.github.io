@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>iVideo — Плейлисты</title>
+    <style>
+        :root {
+            --bg: #303030;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f0f0f0;
+            --text-light: #ccc;
+            --accent: #4b4bff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            font-family: 'MiSans Latin', 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+            padding: 0 20px;
+            min-height: 100vh;
+        }
+        .app {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 16px 0 40px;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 24px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 20px;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+        .header-search {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .header-search svg {
+            flex-shrink: 0;
+            margin-right: 12px;
+            opacity: 0.6;
+        }
+        .header-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #eee;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .header-upload {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #eee;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .header-upload:hover { background: rgba(255,255,255,0.15); }
+        .main { display: flex; gap: 30px; }
+        .sidebar {
+            flex: 0 0 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 16px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 10px 14px;
+            border-radius: 12px;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.08); }
+        .sidebar a.active { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.15); }
+        .spacer { flex: 1; }
+        .content { flex: 1; min-width: 0; }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .playlist-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.25s;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .playlist-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+            background: rgba(255,255,255,0.07);
+        }
+        .playlist-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            background: #222;
+        }
+        .playlist-info {
+            padding: 14px 16px 18px;
+        }
+        .playlist-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #f5f5f5;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .playlist-meta {
+            font-size: 0.8rem;
+            color: #aaa;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .detail-container {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .detail-left {
+            flex: 0 0 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .detail-left img {
+            width: 100%;
+            border-radius: 18px;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        .detail-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .detail-date {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        .detail-count {
+            background: rgba(75,75,255,0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+        }
+        .detail-right {
+            flex: 1;
+            min-width: 300px;
+        }
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .video-item {
+            display: flex;
+            gap: 14px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .video-item:hover { background: rgba(255,255,255,0.08); }
+        .video-item img {
+            width: 160px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .video-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .video-meta .vtitle {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .video-meta .vchannel {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+        .video-meta .vstats {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        .delete-video-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #ff7b7b;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: none;
+        }
+        .video-item:hover .delete-video-btn { display: flex; }
+        .btn-back {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            padding: 6px 16px;
+            color: #ccc;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        .fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            z-index: 200;
+        }
+        .popup-menu {
+            position: fixed;
+            background: rgba(20,20,28,0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+            z-index: 300;
+        }
+        .popup-menu.active { display: flex; }
+        .popup-menu button {
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 12px 16px;
+            text-align: left;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .popup-menu button:hover { background: rgba(255,255,255,0.12); }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-dialog {
+            background: rgba(20,20,28,0.7);
+            backdrop-filter: blur(24px);
+            border-radius: 48px;
+            padding: 32px;
+            max-width: 520px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal-dialog { transform: scale(1); }
+        .modal-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #ccc; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            outline: none;
+            font-size: 0.95rem;
+        }
+        .btn-modal {
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            padding: 12px 28px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            margin-right: 10px;
+        }
+        .btn-modal.primary { background: rgba(75,75,255,0.3); border-color: rgba(75,75,255,0.5); }
+        .hidden { display: none !important; }
+        @media (max-width: 768px) {
+            .main { flex-direction: column; }
+            .sidebar { flex-direction: row; flex-wrap: wrap; gap: 8px; position: static; }
+            .detail-container { flex-direction: column; }
+            .detail-left { flex: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <header class="header">
+        <div class="logo">iVideo</div>
+        <div class="header-search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Поиск по плейлистам...">
+        </div>
+        <a href="https://3.ntv.ru/upload" class="header-upload">Загрузить</a>
+    </header>
+
+    <div class="main">
+        <nav class="sidebar">
+            <a href="https://3.ntv.ru/public/files/51746313/main_page_new.html">Главная</a>
+            <a href="#">Видео</a>
+            <a href="https://3.ntv.ru/public/files/51746313/shorts.html">Shorts</a>
+            <a href="#" class="active">Плейлисты</a>
+            <a href="https://3.ntv.ru/public/files/51746313/production.html">Передачи собственного производства</a>
+            <a href="https://3.ntv.ru/public/files/51746313/movies.html">Смотри кино на iVideo</a>
+            <a href="#">Подкасты</a>
+            <a href="#">Трансляции</a>
+            <a href="#">Эксклюзивы</a>
+            <div class="spacer"></div>
+            <a href="https://3.ntv.ru/public/files/51746313/spravka.html" class="help-btn" style="background:linear-gradient(135deg,#00d4ff,#00bcd4);color:#fff;border:none;padding:12px 16px;border-radius:40px;font-weight:600;text-align:center;">🛟 Справочная служба</a>
+        </nav>
+
+        <div class="content" id="mainContent">
+            <div id="listView">
+                <div class="section-title">📁 Плейлисты</div>
+                <div class="playlist-grid" id="playlistGrid"></div>
+            </div>
+            <div id="detailView" class="hidden">
+                <button class="btn-back" id="backBtn">← Назад к плейлистам</button>
+                <div class="detail-container">
+                    <div class="detail-left">
+                        <img id="detailThumb" src="" alt="">
+                        <div class="detail-title">
+                            <span id="detailTitle"></span>
+                            <button class="btn-back" id="editBtn" style="padding:4px 10px;">✏️</button>
+                        </div>
+                        <div class="detail-date" id="detailDate"></div>
+                        <div class="detail-count" id="detailCount"></div>
+                    </div>
+                    <div class="detail-right">
+                        <div class="section-title" style="margin-bottom:0;">🎬 Видео</div>
+                        <button class="btn-back" id="addVideoBtn" style="margin:10px 0;">+ Добавить видео</button>
+                        <div class="video-list" id="videoList"></div>
+                        <div id="emptyMsg" class="hidden" style="color:#999;text-align:center;padding:20px;">Нет видео</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fab" id="fab">+</div>
+<div class="popup-menu" id="popupMenu">
+    <button id="addPlaylistBtn">📁 Добавить плейлист</button>
+    <button id="deletePlaylistBtn">🗑️ Удалить плейлист</button>
+</div>
+
+<div class="modal-overlay" id="createModal"><div class="modal-dialog">
+    <div class="modal-title">Создать плейлист</div>
+    <div class="form-group"><label>Название</label><input type="text" id="createName" maxlength="256"></div>
+    <div class="form-group"><label>Описание</label><textarea id="createDesc" maxlength="4096" rows="3"></textarea></div>
+    <div class="form-group"><label>Изображение (854x480)</label><input type="file" id="createImage" accept=".webp,.png,.heic,.avif,.svg,image/webp,image/png,image/heic,image/avif,image/svg+xml"><small style="color:#999;">WebP, PNG, HEIC, AVIF, SVG</small></div>
+    <button class="btn-modal" id="cancelCreate">Отмена</button>
+    <button class="btn-modal primary" id="confirmCreate">Создать</button>
+</div></div>
+
+<div class="modal-overlay" id="editModal"><div class="modal-dialog">
+    <div class="modal-title">Редактировать</div>
+    <div class="form-group"><label>Название</label><input type="text" id="editName" maxlength="256"></div>
+    <div class="form-group"><label>Описание</label><textarea id="editDesc" maxlength="4096" rows="3"></textarea></div>
+    <div class="form-group" id="editImageGroup"><label>Изображение (854x480)</label><input type="file" id="editImage" accept=".webp,.png,.heic,.avif,.svg,image/webp,image/png,image/heic,image/avif,image/svg+xml"><small style="color:#999;">WebP, PNG, HEIC, AVIF, SVG</small></div>
+    <button class="btn-modal" id="cancelEdit">Отмена</button>
+    <button class="btn-modal primary" id="saveEdit">Сохранить</button>
+</div></div>
+
+<div class="modal-overlay" id="deleteSelectModal"><div class="modal-dialog">
+    <div class="modal-title">Удалить плейлист</div>
+    <div class="form-group"><label>Выберите</label><select id="deleteSelect"></select></div>
+    <button class="btn-modal" id="cancelDeleteSelect">Отмена</button>
+    <button class="btn-modal primary" id="proceedDelete">Удалить</button>
+</div></div>
+
+<div class="modal-overlay" id="confirmDeleteModal"><div class="modal-dialog" style="text-align:center;">
+    <div style="font-size:3rem;">⚠️</div>
+    <h2>Удаление плейлиста</h2>
+    <p style="margin:16px 0;">Вы уверены? Видео не удаляются.</p>
+    <button class="btn-modal" id="confirmDeleteYes">Да</button>
+    <button class="btn-modal" id="confirmDeleteNo">Нет</button>
+</div></div>
+
+<div class="modal-overlay" id="addVideoModal"><div class="modal-dialog">
+    <div class="modal-title">Добавить видео</div>
+    <div class="form-group"><label>Выберите видео</label><select id="videoSelect"></select></div>
+    <button class="btn-modal" id="cancelAddVideo">Отмена</button>
+    <button class="btn-modal primary" id="addVideoConfirm">Добавить</button>
+</div></div>
+
+<div class="modal-overlay" id="deleteVideoModal"><div class="modal-dialog" style="text-align:center;">
+    <div style="font-size:2.5rem;">🗑️</div>
+    <h2>Убрать видео?</h2>
+    <button class="btn-modal" id="deleteVideoYes">Да</button>
+    <button class="btn-modal" id="deleteVideoNo">Нет</button>
+</div></div>
+
+<script>
+(function() {
+    const BASE_PLAYLISTS = [
+        { id:'pl1', title:'🔥 Лучшие моменты', thumb:'https://picsum.photos/seed/best/400/225.webp', created:'15.03.2026', desc:'', videos:[
+            {id:'v1',thumb:'https://3.ntv.ru/public/files/79327122/_snapshot_44.11.100.webp',title:'Сумасшедшее ТВ 1',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'142 тыс.',uploaded:'10.01.2026',genre:'Развлечения',url:'https://3.ntv.ru/public/files/79327122/symastv1.html'},
+            {id:'v2',thumb:'https://3.ntv.ru/public/files/79327122/_snapshot_00.17.12.870.webp',title:'Сумасшедшее ТВ 2',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'98 тыс.',uploaded:'22.02.2026',genre:'Развлечения',url:'https://3.ntv.ru/public/files/79327122/symastv2_web.html'}
+        ]},
+        { id:'pl2', title:'🎧 Музыка', thumb:'https://picsum.photos/seed/music/400/225.webp', created:'01.04.2026', desc:'', videos:[
+            {id:'v4',thumb:'https://3.ntv.ru/public/files/43874930/_snapshot_01.57.297.webp',title:'Наталья Подольская',channel:'Авторадио',handle:'@avtoradio',views:'230 тыс.',uploaded:'18.03.2026',genre:'Музыка',url:'https://3.ntv.ru/public/files/43874930/avtoradio_Nataliya%20Podoloslkaya_Ne_Boyatsya_Ultra%20HD.html'}
+        ]},
+        { id:'pl3', title:'📰 Новости', thumb:'https://3.ntv.ru/public/files/65496868/playlist_image2.webp', created:'08.06.2026', desc:'', videos:[
+            {id:'v8',thumb:'https://3.ntv.ru/public/files/51746313/_snapshot_00.01.160.webp',title:'Вести',channel:'Вести',handle:'@vesti',views:'560 тыс.',uploaded:'11.08.2023',genre:'Новости',url:'https://3.ntv.ru/public/files/98285119/vesti_110823.html'}
+        ]}
+    ];
+    const AVAILABLE_VIDEOS = [
+        {id:'av1',url:'https://3.ntv.ru/public/files/12647390/fakty180903.html',title:'Факты 18.09.2003',thumb:'https://3.ntv.ru/public/files/12647390/_snapshot_00.12.276.webp',channel:'ICTV',handle:'@ictv',views:'12 тыс.',uploaded:'18.09.2003',genre:'Новости'},
+        {id:'av2',url:'https://3.ntv.ru/public/files/93614409/mykpog270126.html',title:'MykPog',thumb:'https://picsum.photos/seed/mykpog/400/225.webp',channel:'MykPog',handle:'@mykpog',views:'45 тыс.',uploaded:'27.01.2026',genre:'Развлечения'},
+        {id:'av3',url:'https://3.ntv.ru/public/files/57322929/razbormemov4.html',title:'Разбор мемов 4',thumb:'https://3.ntv.ru/public/files/57322929/_snapshot_00.10.953.webp',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'?',uploaded:'2025',genre:'Юмор'},
+        {id:'av4',url:'https://3.ntv.ru/public/files/95890346/carousel130412.html',title:'Карусель инцидент',thumb:'https://3.ntv.ru/public/files/95890346/_snapshot_00.10.522.webp',channel:'Карусель',handle:'@karusel',views:'340 тыс.',uploaded:'13.04.2012',genre:'ТВ'},
+        {id:'av5',url:'https://3.ntv.ru/public/files/81984101/fakty291206.html',title:'Факты 29.12.2006',thumb:'https://3.ntv.ru/public/files/81984101/_snapshot_01.33.831.webp',channel:'ICTV',handle:'@ictv',views:'22 тыс.',uploaded:'29.12.2006',genre:'Новости'},
+        {id:'av6',url:'https://3.ntv.ru/public/files/98285119/vesti_110823.html',title:'Вести 11.08.2023',thumb:'https://3.ntv.ru/public/files/51746313/_snapshot_00.01.160.webp',channel:'Вести',handle:'@vesti',views:'?',uploaded:'11.08.2023',genre:'Новости'},
+        {id:'av7',url:'https://3.ntv.ru/public/files/43874930/avtoradio_Nataliya%20Podoloslkaya_Ne_Boyatsya_Ultra%20HD.html',title:'Наталья Подольская',thumb:'https://3.ntv.ru/public/files/43874930/_snapshot_01.57.297.webp',channel:'Авторадио',handle:'@avtoradio',views:'230 тыс.',uploaded:'18.03.2026',genre:'Музыка'},
+        {id:'av8',url:'https://3.ntv.ru/public/files/16209921/fudvikommet_archive_21092024.html',title:'Архив ФуджиКОММЕТ',thumb:'https://3.ntv.ru/public/files/19924712/fudvikommet_player.png',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'18 тыс.',uploaded:'12.01.2026',genre:'Архив'},
+        {id:'av9',url:'https://3.ntv.ru/public/files/81254960/debata_gozdyry_050626.html',title:'Debata Gozdyry',thumb:'https://3.ntv.ru/public/files/81254960/_snapshot_00.09.109.webp',channel:'Debata',handle:'@debata',views:'?',uploaded:'05.06.2026',genre:'Дискуссия'},
+        {id:'av10',url:'https://3.ntv.ru/public/files/33775316/fakty040715.html',title:'Факты 04.07.2015',thumb:'https://3.ntv.ru/public/files/33775316/Факты%20ICTV%204.07.2015%2012_45_432p.mp4_snapshot_00.44.866.webp',channel:'ICTV',handle:'@ictv',views:'?',uploaded:'04.07.2015',genre:'Новости'},
+        {id:'av11',url:'https://3.ntv.ru/public/files/13301643/ruda_video_26052026_2.html',title:'Я поменял жизнь',thumb:'https://3.ntv.ru/public/files/84714890/maxresdefault%20(2).webp',channel:'Ruda',handle:'@ruda',views:'error',uploaded:'26.05.2026',genre:'Мотивация'},
+        {id:'av12',url:'https://3.ntv.ru/public/files/79327122/symastv2_web.html',title:'Сумасшедшее ТВ 2',thumb:'https://3.ntv.ru/public/files/79327122/_snapshot_00.17.12.870.webp',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'98 тыс.',uploaded:'22.02.2026',genre:'Развлечения'},
+        {id:'av13',url:'https://3.ntv.ru/public/files/79327122/symastv1.html',title:'Сумасшедшее ТВ 1',thumb:'https://3.ntv.ru/public/files/79327122/_snapshot_44.11.100.webp',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'142 тыс.',uploaded:'10.01.2026',genre:'Развлечения'},
+        {id:'av14',url:'https://3.ntv.ru/public/files/62702448/krabotov.html',title:'Фиксики против кработов',thumb:'https://3.ntv.ru/public/files/62702448/playlist_image4.webp',channel:'invalid',handle:'@ivideo_films',views:'142 тыс.',uploaded:'14.04.2023',genre:'Фильмы'},
+        {id:'av15',url:'https://3.ntv.ru/public/files/35893218/symastv3.html',title:'Сумасшедшее телевидение - Выпуск 3',thumb:'https://3.ntv.ru/public/files/35893218/_snapshot_00.52.07.299.webp',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'?',uploaded:'?',genre:'Развлечения'},
+        {id:'av16',url:'https://3.ntv.ru/public/files/73774174/gpoeu270708.html',title:'Галопам по Европам / 27 июля 2008',thumb:'https://3.ntv.ru/public/files/73774174/720_467414065222.webp',channel:'Галопам по Европам',handle:'@galopam',views:'?',uploaded:'27.07.2008',genre:'ТВ'},
+        {id:'av17',url:'https://3.ntv.ru/public/files/89036946/fakty2004.html',title:'Спецвыпуск Фактов / 2004 г.',thumb:'https://3.ntv.ru/public/files/12647390/_snapshot_00.12.276.webp',channel:'Архив Фактов',handle:'@archive',views:'?',uploaded:'2004',genre:'Новости'},
+        {id:'av18',url:'https://3.ntv.ru/public/files/77278301/panicroom.html',title:'Комната страха',thumb:'https://3.ntv.ru/public/files/77278301/1080_471117065410.webp',channel:'iVideo Фильмы',handle:'@ivideo_films',views:'?',uploaded:'?',genre:'Фильмы'},
+        {id:'av19',url:'https://3.ntv.ru/public/files/64211968/ruda050626.html',title:'СТРИМ - РАЗДАЧА ДОНАТА на сервере OreMine',thumb:'https://3.ntv.ru/public/files/64211968/maxresdefault.webp',channel:'streams_record',handle:'@streams_record',views:'?',uploaded:'05.06.2026',genre:'Стрим'},
+        {id:'av20',url:'https://3.ntv.ru/public/files/80370648/luka4.html',title:'В понедельник дойдет до Лукашенко!',thumb:'https://3.ntv.ru/public/files/80370648/1080_469422067400.webp',channel:'videobel',handle:'@videobel',views:'?',uploaded:'?',genre:'Новости'},
+        {id:'av21',url:'https://3.ntv.ru/public/files/92829670/slepaya1342_new.html',title:'😨 ТЕЛЕФОН, КОТОРЫЙ ШЕПЧЕТ ИМЕНА МЁРТВЫХ...',thumb:'https://3.ntv.ru/public/files/92829670/_snapshot_03.03.600.webp',channel:'СЛЕПАЯ',handle:'@slepaya',views:'?',uploaded:'?',genre:'Мистика'},
+        {id:'av22',url:'https://3.ntv.ru/public/files/24571166/f1trailer.html',title:'Фильм «Форсаж 1» (2025) | Трейлер 4K HDR',thumb:'https://3.ntv.ru/public/files/24571166/Du481sOHopU_maxres.webp',channel:'Трейлеры HDR',handle:'@trei',views:'?',uploaded:'2025',genre:'Трейлер'},
+        {id:'av23',url:'https://3.ntv.ru/public/files/66227233/symastv4.html',title:'Сумасшедшое телевидение: выпуск 4',thumb:'https://3.ntv.ru/public/files/66227233/_snapshot_00.24.51.750.webp',channel:'ФуджиКОММЕТ',handle:'@fujikommet',views:'?',uploaded:'?',genre:'Развлечения'}
+    ];
+
+    const STORAGE_USER = 'ivideo_user_playlists';
+    const STORAGE_MODIFIED = 'ivideo_modified_base';
+    function loadUser() { try { return JSON.parse(localStorage.getItem(STORAGE_USER) || '[]'); } catch { return []; } }
+    function saveUser(arr) { localStorage.setItem(STORAGE_USER, JSON.stringify(arr)); }
+    function loadModified() { try { return JSON.parse(localStorage.getItem(STORAGE_MODIFIED) || '{}'); } catch { return {}; } }
+    function saveModified(obj) { localStorage.setItem(STORAGE_MODIFIED, JSON.stringify(obj)); }
+
+    const modifiedBase = loadModified();
+    let allPlaylists = BASE_PLAYLISTS.map(p => modifiedBase[p.id] || p);
+    allPlaylists = [...allPlaylists, ...loadUser()];
+    let currentPlaylist = null;
+    let pendingDeleteVideoIndex = null;
+    let pendingDeletePlaylistId = null;
+
+    const $ = id => document.getElementById(id);
+    const listView = $('listView');
+    const detailView = $('detailView');
+    const playlistGrid = $('playlistGrid');
+    const backBtn = $('backBtn');
+    const detailThumb = $('detailThumb');
+    const detailTitle = $('detailTitle');
+    const detailDate = $('detailDate');
+    const detailCount = $('detailCount');
+    const videoList = $('videoList');
+    const emptyMsg = $('emptyMsg');
+    const editBtn = $('editBtn');
+    const addVideoBtn = $('addVideoBtn');
+
+    function renderGrid() {
+        playlistGrid.innerHTML = allPlaylists.map(p => `
+            <div class="playlist-card" data-id="${p.id}">
+                <img class="playlist-thumb" src="${p.thumb}" alt="">
+                <div class="playlist-info">
+                    <div class="playlist-title">${p.title}</div>
+                    <div class="playlist-meta">
+                        <span>${p.created}</span>
+                        <span>•</span>
+                        <span>${p.videos.length} видео</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.playlist-card').forEach(card => card.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const pl = allPlaylists.find(p => p.id === id);
+            if (pl) showDetail(pl);
+        }));
+    }
+
+    function showDetail(playlist) {
+        currentPlaylist = playlist;
+        detailThumb.src = playlist.thumb;
+        detailTitle.textContent = playlist.title;
+        detailDate.textContent = '📅 ' + playlist.created;
+        detailCount.textContent = '📼 ' + playlist.videos.length + ' видео';
+        renderVideoList(playlist);
+        listView.classList.add('hidden');
+        detailView.classList.remove('hidden');
+    }
+
+    function renderVideoList(playlist) {
+        videoList.innerHTML = '';
+        if (playlist.videos.length === 0) {
+            emptyMsg.classList.remove('hidden');
+            videoList.classList.add('hidden');
+        } else {
+            emptyMsg.classList.add('hidden');
+            videoList.classList.remove('hidden');
+            videoList.innerHTML = playlist.videos.map((v,i) => `
+                <div class="video-item" data-url="${v.url}" data-index="${i}">
+                    <img src="${v.thumb}" alt="">
+                    <div class="video-meta">
+                        <div class="vtitle">${v.title}</div>
+                        <div class="vchannel">${v.channel} <span style="color:#999;">${v.handle}</span></div>
+                        <div class="vstats">👁 ${v.views} • 📅 ${v.uploaded} • ${v.genre}</div>
+                    </div>
+                    <button class="delete-video-btn">🗑️</button>
+                </div>
+            `).join('');
+        }
+        document.querySelectorAll('.video-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.closest('.delete-video-btn')) return;
+                window.location.href = this.dataset.url;
+            });
+            const delBtn = item.querySelector('.delete-video-btn');
+            delBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                pendingDeleteVideoIndex = parseInt(item.dataset.index);
+                $('deleteVideoModal').classList.add('active');
+            });
+        });
+    }
+
+    backBtn.addEventListener('click', () => {
+        listView.classList.remove('hidden');
+        detailView.classList.add('hidden');
+    });
+
+    function saveAll() {
+        const modified = {};
+        allPlaylists.forEach(p => { if (BASE_PLAYLISTS.some(b => b.id === p.id)) modified[p.id] = p; });
+        saveModified(modified);
+        const users = allPlaylists.filter(p => p.id.startsWith('user_'));
+        saveUser(users);
+    }
+
+    function addVideo(videoData) {
+        currentPlaylist.videos.push({...videoData, id:'v'+Date.now()});
+        const idx = allPlaylists.findIndex(p => p.id === currentPlaylist.id);
+        if (idx !== -1) allPlaylists[idx] = currentPlaylist;
+        saveAll();
+        renderVideoList(currentPlaylist);
+        renderGrid();
+    }
+
+    function removeVideo(index) {
+        currentPlaylist.videos.splice(index, 1);
+        const idx = allPlaylists.findIndex(p => p.id === currentPlaylist.id);
+        if (idx !== -1) allPlaylists[idx] = currentPlaylist;
+        saveAll();
+        renderVideoList(currentPlaylist);
+        renderGrid();
+    }
+
+    addVideoBtn.addEventListener('click', () => {
+        if (!currentPlaylist) return;
+        $('videoSelect').innerHTML = AVAILABLE_VIDEOS.map(v => `<option value="${v.id}">${v.title}</option>`).join('');
+        $('addVideoModal').classList.add('active');
+    });
+
+    $('cancelAddVideo').addEventListener('click', () => $('addVideoModal').classList.remove('active'));
+    $('addVideoConfirm').addEventListener('click', () => {
+        const vid = AVAILABLE_VIDEOS.find(v => v.id === $('videoSelect').value);
+        if (vid) addVideo(vid);
+        $('addVideoModal').classList.remove('active');
+    });
+
+    $('deleteVideoYes').addEventListener('click', () => {
+        if (pendingDeleteVideoIndex !== null) removeVideo(pendingDeleteVideoIndex);
+        $('deleteVideoModal').classList.remove('active');
+    });
+    $('deleteVideoNo').addEventListener('click', () => $('deleteVideoModal').classList.remove('active'));
+
+    editBtn.addEventListener('click', () => {
+        if (!currentPlaylist) return;
+        $('editName').value = currentPlaylist.title;
+        $('editDesc').value = currentPlaylist.desc || '';
+        if (currentPlaylist.id.startsWith('user_')) {
+            $('editImageGroup').style.display = 'block';
+        } else {
+            $('editImageGroup').style.display = 'none';
+        }
+        $('editModal').classList.add('active');
+    });
+    $('cancelEdit').addEventListener('click', () => $('editModal').classList.remove('active'));
+    $('saveEdit').addEventListener('click', () => {
+        const name = $('editName').value.trim();
+        if (!name) return alert('Введите название');
+        currentPlaylist.title = name;
+        currentPlaylist.desc = $('editDesc').value.trim();
+        if (currentPlaylist.id.startsWith('user_') && $('editImage').files[0]) {
+            const file = $('editImage').files[0];
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    if (img.width <= 854 && img.height <= 480) {
+                        currentPlaylist.thumb = e.target.result;
+                        finishEdit();
+                    } else alert('Изображение больше 854x480');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else { finishEdit(); }
+    });
+    function finishEdit() {
+        const idx = allPlaylists.findIndex(p => p.id === currentPlaylist.id);
+        if (idx !== -1) allPlaylists[idx] = currentPlaylist;
+        saveAll();
+        detailThumb.src = currentPlaylist.thumb;
+        detailTitle.textContent = currentPlaylist.title;
+        renderGrid();
+        $('editModal').classList.remove('active');
+    }
+
+    (function fabInit() {
+        const fab = $('fab');
+        const popup = $('popupMenu');
+        let timer;
+        fab.addEventListener('mousedown', e => { e.preventDefault(); timer = setTimeout(() => popup.classList.add('active'), 500); });
+        fab.addEventListener('touchstart', e => { e.preventDefault(); timer = setTimeout(() => popup.classList.add('active'), 500); });
+        fab.addEventListener('mouseup', () => clearTimeout(timer));
+        fab.addEventListener('touchend', () => clearTimeout(timer));
+        fab.addEventListener('click', () => { if (timer) { clearTimeout(timer); $('createModal').classList.add('active'); } });
+        document.addEventListener('click', e => { if (!popup.contains(e.target) && e.target !== fab) popup.classList.remove('active'); });
+        $('addPlaylistBtn').addEventListener('click', () => { popup.classList.remove('active'); $('createModal').classList.add('active'); });
+        $('deletePlaylistBtn').addEventListener('click', () => {
+            popup.classList.remove('active');
+            const users = allPlaylists.filter(p => p.id.startsWith('user_'));
+            const select = $('deleteSelect');
+            select.innerHTML = '';
+            if (users.length === 0) {
+                alert('Нет пользовательских плейлистов');
+                return;
+            }
+            users.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.title; select.appendChild(o); });
+            $('deleteSelectModal').classList.add('active');
+        });
+    })();
+
+    $('cancelCreate').addEventListener('click', () => $('createModal').classList.remove('active'));
+    $('confirmCreate').addEventListener('click', () => {
+        const name = $('createName').value.trim();
+        if (!name) return alert('Введите название');
+        const file = $('createImage').files[0];
+        const process = (imgUrl) => {
+            const newId = 'user_' + Date.now();
+            const created = new Date().toLocaleDateString('ru');
+            const pl = { id: newId, title: name, thumb: imgUrl, created, desc: $('createDesc').value.trim(), videos: [] };
+            allPlaylists.push(pl);
+            saveAll();
+            renderGrid();
+            $('createModal').classList.remove('active');
+        };
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => { if (img.width <= 854 && img.height <= 480) process(e.target.result); else alert('Размер больше 854x480'); };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else process('https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/225.webp');
+    });
+
+    $('cancelDeleteSelect').addEventListener('click', () => $('deleteSelectModal').classList.remove('active'));
+    $('proceedDelete').addEventListener('click', () => {
+        pendingDeletePlaylistId = $('deleteSelect').value;
+        $('confirmDeleteModal').classList.add('active');
+    });
+    $('confirmDeleteYes').addEventListener('click', () => {
+        if (pendingDeletePlaylistId) {
+            allPlaylists = allPlaylists.filter(p => p.id !== pendingDeletePlaylistId);
+            saveAll();
+            renderGrid();
+        }
+        $('confirmDeleteModal').classList.remove('active');
+        $('deleteSelectModal').classList.remove('active');
+    });
+    $('confirmDeleteNo').addEventListener('click', () => $('confirmDeleteModal').classList.remove('active'));
+
+    renderGrid();
+})();
+</script>
+</body>
+</html>
