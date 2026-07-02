@@ -25,6 +25,24 @@
       padding: 16px 0 40px;
     }
 
+    /* --- Баннер тестовой версии --- */
+    .test-banner {
+      background: rgba(255, 215, 0, 0.12);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      border-radius: 16px;
+      padding: 10px 20px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #f0e6b0;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(255, 215, 0, 0.08);
+    }
+    .test-banner strong {
+      color: #ffd700;
+    }
+
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -576,6 +594,11 @@
 </head>
 <body>
 <div class="app">
+
+  <!-- Баннер тестовой версии -->
+  <div class="test-banner">
+    <strong>🧪 GitHub версия видеохостинга.</strong> Все страницы располагаются здесь, но видео расположены на другом CDN. Эта версия предназначена для внутреннего тестирования.
+  </div>
 
   <header class="header">
     <div class="logo">iVideo</div>
