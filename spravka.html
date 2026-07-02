@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>iVideo — Справочная служба</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #303030;
+            font-family: 'MiSans Latin', 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: #f0f0f0;
+            line-height: 1.5;
+            padding: 0 20px;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 16px 0 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 24px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-badge {
+            background: #00bcd4;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .search-icon-btn {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #eee;
+            text-decoration: none;
+        }
+
+        .search-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .main {
+            display: flex;
+            gap: 30px;
+        }
+
+        .sidebar {
+            flex: 0 0 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 16px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 10px 14px;
+            border-radius: 12px;
+            transition: background 0.2s, color 0.2s;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .faq-header {
+            margin-bottom: 28px;
+            padding: 24px 28px;
+            border-radius: 32px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .faq-header .subtitle {
+            font-size: 1rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .faq-section {
+            margin-bottom: 32px;
+        }
+
+        .faq-category-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 12px;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .faq-item.open {
+            border-color: #00bcd4;
+            box-shadow: 0 8px 24px rgba(0, 188, 212, 0.2);
+        }
+
+        .faq-question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            gap: 12px;
+            user-select: none;
+        }
+
+        .faq-question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #f0f0f0;
+            flex: 1;
+        }
+
+        .faq-arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1);
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+            background: rgba(0, 188, 212, 0.4);
+            color: #fff;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.2, 0.9, 0.4, 1), padding 0.4s ease;
+            padding: 0 20px;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 800px;
+            padding: 0 20px 18px;
+        }
+
+        .faq-answer-content {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.7;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 3px solid #00bcd4;
+        }
+
+        .faq-answer-content a {
+            color: #00d4ff;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .faq-answer-content a:hover {
+            color: #80e0ff;
+        }
+
+        .faq-answer-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .faq-answer-content ul li::before {
+            content: '•';
+            color: #00bcd4;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .faq-answer-content ul li {
+            margin: 6px 0;
+        }
+
+        .highlight-box {
+            background: rgba(0, 188, 212, 0.1);
+            border: 1px solid rgba(0, 188, 212, 0.25);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #e0e0ff;
+        }
+
+        .contact-section {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 32px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .contact-section h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .contact-section p {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 188, 212, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 188, 212, 0.5);
+            border-radius: 40px;
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .contact-btn:hover {
+            background: rgba(0, 188, 212, 0.45);
+            border-color: rgba(0, 188, 212, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0, 188, 212, 0.3);
+        }
+
+        .contact-btn.disabled {
+            opacity: 0.6;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            padding: 20px 0 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(200, 200, 220, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-note a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 188, 212, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            background: rgba(0, 188, 212, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 188, 212, 0.4);
+        }
+
+        @media (max-width: 992px) {
+            .main {
+                flex-direction: column;
+            }
+            .sidebar {
+                flex: 0 0 auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 4px 8px;
+                margin-bottom: 16px;
+                padding: 12px;
+                position: static;
+                height: auto;
+            }
+            .sidebar a {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px;
+            }
+            .header-controls {
+                justify-content: center;
+            }
+            .faq-header {
+                padding: 20px 16px;
+            }
+            .faq-header h1 {
+                font-size: 1.5rem;
+            }
+            .faq-question {
+                padding: 14px 16px;
+            }
+            .faq-answer-content {
+                font-size: 0.85rem;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .faq-category-title {
+                font-size: 1.2rem;
+            }
+            .back-to-top {
+                bottom: 16px;
+                right: 16px;
+                width: 38px;
+                height: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="logo">
+                iVideo
+                <span class="logo-badge">справка</span>
+            </div>
+            <div class="header-controls">
+                <a href="https://3.ntv.ru/public/files/51746313/search_page.html" class="search-icon-btn" title="Поиск по сайту" aria-label="Поиск">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                </a>
+                <a href="https://3.ntv.ru/public/files/51746313/main_page.html" class="home-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    Главная
+                </a>
+            </div>
+        </header>
+
+        <div class="main">
+            <nav class="sidebar">
+                <a href="#upload">📤 Загрузка</a>
+                <a href="#download">📥 Скачивание</a>
+                <a href="#formats">🎬 Форматы</a>
+                <a href="#hdr">🌈 HDR</a>
+                <a href="#content">📺 Контент</a>
+                <a href="#ivideoplus">✨ iVideo+</a>
+                <a href="#account">👤 Аккаунт</a>
+                <a href="#channels">📢 Каналы</a>
+                <a href="#subscriptions">🔔 Подписки</a>
+                <a href="#app">📱 Приложение</a>
+                <a href="#problems">🛠 Проблемы</a>
+                <a href="#rules">📜 Правила</a>
+                <a href="#contacts">📬 Контакты</a>
+            </nav>
+
+            <div class="content">
+                <div class="faq-header">
+                    <h1>📖 Справка и часто задаваемые вопросы</h1>
+                    <p class="subtitle">Всё о видеохостинге iVideo: загрузка, скачивание, форматы, HDR, iVideo+, приложение, аккаунт, каналы и правила.</p>
+                </div>
+
+                <section class="faq-section" id="upload">
+                    <div class="faq-category-title">📤 Загрузка видео на платформу</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как загрузить видео на iVideo?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Чтобы загрузить видео, выполните следующие шаги:</p>
+                                <ul>
+                                    <li>Нажмите кнопку <strong>«Загрузить»</strong> в шапке главной страницы.</li>
+                                    <li>Выберите тип контента: <strong>Shorts</strong>, <strong>Видео</strong> или <strong>Подкаст</strong>.</li>
+                                    <li>Ознакомьтесь с требованиями к формату (они появятся в модальном окне).</li>
+                                    <li>Нажмите кнопку загрузки — вы будете перенаправлены на страницу <strong>3.ntv.ru/upload</strong>.</li>
+                                    <li>Выберите файл с вашего устройства и дождитесь окончания загрузки.</li>
+                                </ul>
+                                <div class="highlight-box">
+                                    ⚠️ <strong>Важно:</strong> видеохостинг находится в стадии бета-тестирования. После загрузки может потребоваться помощь администратора (ФуджиКОММЕТ) для публикации страницы с вашим видео.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Какие файлы можно загружать?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Поддерживаемые форматы зависят от типа контента:</p>
+                                <ul>
+                                    <li><strong>Видео:</strong> H.264/AVC, H.265/HEVC, VP9, VP8, AV1, APV, VC-1 (WMV9).</li>
+                                    <li><strong>Shorts:</strong> те же видеокодеки, соотношение сторон 9:16, длина до 4 минут.</li>
+                                    <li><strong>Подкасты (аудио):</strong> AAC-LC, HE-AAC, HE-AACv2, PCM, Opus, Vorbis, FLAC, AMR-NB, AMR-WB, MP2, MP3.</li>
+                                </ul>
+                                <p>Максимальный размер файла: <strong>до 384 ГБ</strong> для обычных видео, <strong>до 5 ГБ</strong> для Shorts.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Почему моё видео не отображается после загрузки?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Это связано с тем, что платформа находится в <strong>бета-тестировании</strong>. После загрузки файла через 3.ntv.ru администратор (ФуджиКОММЕТ) должен вручную создать страницу для вашего видео. Пожалуйста, свяжитесь с ним для завершения публикации.</p>
+                                <p>Когда платформа заработает полноценно, процесс будет полностью автоматизирован — мы сообщим об этом через наши социальные сети.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="download">
+                    <div class="faq-category-title">📥 Скачивание видео</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как скачать видео с iVideo?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>На всех видео вы можете воспользоваться <strong>MAX Video Downloader</strong> — официальным инструментом для скачивания контента. Для новых видео также доступно скачивание через <strong>yt-dlp</strong> (поддерживает HLS/DASH потоки).</p>
+                                <p>Инструкция для yt-dlp:</p>
+                                <ul>
+                                    <li>Установите yt-dlp с официального сайта.</li>
+                                    <li>В командной строке выполните: <code>yt-dlp "ссылка на видео"</code></li>
+                                    <li>Видео сохранится в наилучшем доступном качестве.</li>
+                                </ul>
+                                <p>Обратите внимание: право на скачивание может быть ограничено автором видео. Уважайте авторские права.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="formats">
+                    <div class="faq-category-title">🎬 Форматы, кодеки и качество</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Какое максимальное разрешение поддерживается?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>iVideo поддерживает разрешение вплоть до <strong>7680×4320 (8K UHD)</strong> для обычных видео. Для Shorts максимальное разрешение — <strong>2160×3840</strong> (вертикальное 4K).</p>
+                                <p>После загрузки видео переконвертируется в формат <strong>HLS</strong> для адаптивного потокового вещания.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Какие аудиокодеки можно использовать?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Для видеофайлов аудиокодек <strong>не важен</strong> — система примет практически любой. Для подкастов поддерживаются:</p>
+                                <ul>
+                                    <li>AAC-LC / HE-AAC / HE-AACv2</li>
+                                    <li>PCM (несжатый звук)</li>
+                                    <li>Opus и Vorbis</li>
+                                    <li>FLAC (сжатие без потерь)</li>
+                                    <li>AMR-NB / AMR-WB</li>
+                                    <li>MP2 и MP3</li>
+                                </ul>
+                                <p>Максимальная глубина: <strong>24 бита</strong>, частота дискретизации: до <strong>48 кГц</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое HLS и зачем он нужен?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>HLS (HTTP Live Streaming)</strong> — это протокол адаптивного потокового вещания, разработанный Apple. После загрузки ваше видео автоматически переконвертируется в HLS, что даёт:</p>
+                                <ul>
+                                    <li>Автоматический выбор качества под скорость интернета зрителя.</li>
+                                    <li>Плавный просмотр без буферизации.</li>
+                                    <li>Совместимость со всеми современными браузерами и устройствами.</li>
+                                    <li>Возможность моментальной перемотки на любой момент видео.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое MPEG-DASH и поддерживается ли он на iVideo?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>MPEG-DASH (Dynamic Adaptive Streaming over HTTP)</strong> — международный стандарт адаптивного вещания. iVideo использует его наряду с HLS для наилучшей совместимости.</p>
+                                <p><strong>Поддерживаемые кодеки в MPEG-DASH:</strong></p>
+                                <ul>
+                                    <li><strong>Видео:</strong> H.264/AVC, H.265/HEVC, VP8, VP9, AV1, AV2, APV, VC-1 (WMV9).</li>
+                                    <li><strong>Аудио:</strong> AAC (все профили), MP3, Vorbis, Opus, PCM, FLAC.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="hdr">
+                    <div class="faq-category-title">🌈 HDR видео</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое HDR и поддерживает ли iVideo HDR-видео?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>HDR (High Dynamic Range)</strong> — технология расширенного динамического диапазона, обеспечивающая более яркие светлые участки, глубокие тени и насыщенные цвета. iVideo <strong>полностью поддерживает HDR-видео</strong>: вы можете загружать, хранить и воспроизводить ролики с HDR.</p>
+                                <p>При загрузке HDR-контент сохраняется с оригинальными метаданными, а при просмотре автоматически определяется тип HDR и подбирается оптимальный режим отображения.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Какие форматы HDR поддерживаются?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Платформа поддерживает следующие стандарты HDR:</p>
+                                <ul>
+                                    <li><strong>HDR10</strong> — базовый открытый стандарт с статическими метаданными.</li>
+                                    <li><strong>HDR10+</strong> — улучшенная версия с динамическими метаданными для покадровой оптимизации.</li>
+                                    <li><strong>HLG (Hybrid Log-Gamma)</strong> — формат, совместимый с SDR-дисплеями.</li>
+                                </ul>
+                                <div class="highlight-box">
+                                    ❌ <strong>Dolby Vision не поддерживается</strong> из-за лицензионных ограничений и невозможности корректной конвертации файлов этого формата HDR. Если ваше устройство не поддерживает HDR, видео будет автоматически преобразовано в SDR с сохранением корректных цветов (тоунмаппинг).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как хранятся HDR-видео и чем они отличаются по качеству от SDR?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>При загрузке HDR-видео платформа автоматически создаёт <strong>две копии</strong>:</p>
+                                <ul>
+                                    <li><strong>SDR-копия</strong> — кодируется в H.264 для максимальной совместимости с устройствами без поддержки HDR.</li>
+                                    <li><strong>HDR-копия</strong> — кодируется в H.265 (HEVC) с сохранением полного динамического диапазона и метаданных.</li>
+                                </ul>
+                                <p>Кроме того, <strong>HDR имеет больший битрейт</strong> по сравнению с SDR-видео. Это необходимо для передачи расширенного диапазона яркости и цвета без потери качества. Благодаря двойному хранению ваше видео будет доступно в наилучшем качестве на любом устройстве.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="content">
+                    <div class="faq-category-title">📺 Контент на iVideo</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое «Передачи собственного производства»?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Оригинальные шоу, созданные командой iVideo или партнёрами. Включают «Сумасшедшое телевидение», «Разбор мемов» и другие проекты.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что значит «Смотри кино на iVideo»?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Раздел с полнометражными фильмами, отмеченный баннером <strong>🎬 Смотри кино на iVideo</strong>. Например, «Фиксики против кработов», «Комната страха».</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое «Эксклюзивы iVideo»?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Контент, недоступный на других платформах, с бейджем <strong>🔥 Только на iVideo</strong>. Уникальные интервью, закулисье, мастер-классы.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="ivideoplus">
+                    <div class="faq-category-title">✨ iVideo+</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Что такое iVideo+?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>iVideo+</strong> — это функция улучшенного качества для обычных видео, которая доступна прямо в плеере. Она не требует отдельной подписки и может быть включена для любого видео по желанию зрителя.</p>
+                                <p>По сути, iVideo+ повышает битрейт видео на <strong>45%</strong>, что делает картинку более чёткой и детализированной, особенно на больших экранах. Это не HDR и не новое разрешение — просто более качественная обработка исходного потока.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как включить iVideo+?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>В плеере любого видео вы найдёте переключатель <strong>«Включить iVideo+»</strong>. Просто нажмите на него, и качество видеопотока будет автоматически увеличено (битрейт возрастёт на 45%).</p>
+                                <p>Функция работает мгновенно: вам не нужно обновлять страницу или перезапускать видео. Отключить iVideo+ можно тем же переключателем в любой момент.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как именно улучшается битрейт и зачем это нужно?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>При активации iVideo+ битрейт видео увеличивается <strong>на 45%</strong> относительно стандартного. Это значит, что на каждый кадр выделяется больше данных, что особенно заметно в динамичных сценах, мелких деталях и при просмотре на больших мониторах или телевизорах.</p>
+                                <p>Важно понимать: iVideo+ не изменяет кодек или разрешение — он просто даёт плееру команду запрашивать более качественный поток с сервера (если он доступен). Поэтому для наилучшего эффекта рекомендуется смотреть видео в высоком разрешении (от 1080p и выше).</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="account">
+                    <div class="faq-category-title">👤 Аккаунт и профиль</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как создать аккаунт на iVideo?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Регистрация через <strong>ivideo.me/aacount/vxod</strong>. Следуйте инструкциям на главной странице.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как восстановить пароль?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Перейдите на <strong>ivideo.me/restore</strong>, воспользуйтесь ссылкой «Забыли пароль?». Письмо придёт на почту.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Можно ли удалить свой аккаунт?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Да, через форму обратной связи. Видео останутся, но канал будет помечен как удалённый. Запрос обрабатывается до 7 дней.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="channels">
+                    <div class="faq-category-title">📢 Каналы</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">В каком формате можно задать юзернейм канала?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Юзернейм можно использовать как в латинице (my_channel), так и в кириллице (мой_канал). Регистр не важен для поиска.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Сколько раз можно менять юзернейм?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Не более 25 раз в течение 7 дней. Если лимит исчерпан, появится кнопка «Запросить запросы» для обнуления счётчика.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как создать канал?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Канал создаётся автоматически при регистрации. Настройте юзернейм, аватар и описание в профиле.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как настроить описание и аватар канала?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>В разделе «Мой канал»: аватар 800×800 (JPEG/PNG), описание до 1000 символов, ссылки на соцсети.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Можно ли удалить канал?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Да, через настройки аккаунта. Видео сохранятся с пометкой «Канал удалён». Восстановление невозможно.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Сколько каналов можно создать на одном аккаунте?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Один аккаунт поддерживает до <strong>1000 каналов</strong>. Для каждого канала можно задать уникальный юзернейм и оформление.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="subscriptions">
+                    <div class="faq-category-title">🔔 Подписки на аккаунте</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">На сколько каналов можно подписаться?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>В одном аккаунте можно подписаться на <strong>6200 каналов</strong>. После превышения этого лимита подписка на новые каналы будет недоступна.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как увеличить лимит подписок?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Если вы достигли лимита в 6200 подписок, можно отправить запрос на <a href="https://ivideo.me/dopabit-kolichestvo-kanalov" target="_blank">ivideo.me/dopabit-kolichestvo-kanalov</a>. После одобрения количество доступных подписок будет увеличено вдвое (до 12400).</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="app">
+                    <div class="faq-category-title">📱 Приложение iVideo</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">На каких платформах доступно приложение iVideo?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Приложение iVideo доступно для следующих операционных систем:</p>
+                                <ul>
+                                    <li><strong>macOS</strong> — начиная с версии 10.4.4 (поддержка Apple ARM и Intel)</li>
+                                    <li><strong>Windows</strong> — начиная с Windows Vista</li>
+                                    <li><strong>Linux</strong> — ядро 2.4.2 и выше (32 и 64 бита), RPM и DEB пакеты начиная с Debian 2</li>
+                                    <li><strong>Android</strong> — начиная с версии 6.0</li>
+                                    <li><strong>iOS</strong> — начиная с версии 12.4.1</li>
+                                    <li><strong>Windows Phone</strong> — версия 8 и выше</li>
+                                    <li><strong>Браузеры на базе Chromium</strong> — доступно сейчас через PWA apps.</li>
+                                </ul>
+                                <p>Скачать приложение можно из официальных магазинов приложений или с сайта iVideo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для macOS</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Приложение работает на Mac с процессором Apple Silicon (ARM) или Intel, начиная с macOS 10.4.4. Рекомендуется обновить систему до последней доступной версии для лучшей производительности.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для Windows</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Минимальная версия — Windows Vista. Приложение полностью совместимо с Windows 7, 8, 10, 11 и более новыми. Рекомендуется 64-разрядная система.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для Linux</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Ядро Linux версии 2.4.2 или выше (32-бит и 64-бит). Доступны пакеты RPM и DEB, поддержка начинается с Debian 2. Также возможна ручная установка через универсальный AppImage.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для Android</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Приложение работает на устройствах с Android 6.0 (Marshmallow) и выше. Для оптимальной работы требуется не менее 2 ГБ ОЗУ.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для iOS</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Поддерживаются iPhone и iPad с iOS 12.4.1 или новее. Рекомендуется использовать последнюю версию iOS.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Требования для Windows Phone</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Приложение совместимо с Windows Phone 8 и более новыми версиями (8.1, 10). Загрузка возможна через Microsoft Store.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="problems">
+                    <div class="faq-category-title">🛠 Проблемы и их решение</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Видео не воспроизводится — что делать?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Обновите страницу, проверьте скорость интернета (мин. 5 Мбит/с для HD), очистите кэш браузера или попробуйте другой браузер.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Страница с видео не найдена (ошибка 404)</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Видео ожидает публикации, ссылка устарела или файл удалён. Свяжитесь с поддержкой, если ошибка повторяется.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Почему видео зависает или тормозит?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Причины: низкая скорость интернета, загруженность сервера или слабое устройство. Попробуйте понизить качество в плеере.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="rules">
+                    <div class="faq-category-title">📜 Правила платформы</div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Какой контент запрещён к загрузке?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Запрещены: нарушения авторских прав, контент для взрослых, экстремизм, символика, запрещённая в РФ/РБ, пропаганда насилия, наркотиков, политика, спам и вредоносное ПО.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+                            <span class="faq-question-text">Как пожаловаться на видео?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Скопируйте ссылку, опишите причину и отправьте через контакты в разделе <a href="#contacts">«Контакты»</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="faq-section" id="contacts">
+                    <div class="faq-category-title">📬 Контакты и поддержка</div>
+                </section>
+
+                <div class="contact-section">
+                    <h3>📬 Нужна помощь?</h3>
+                    <p>Не нашли ответ? Свяжитесь с нами через социальные сети или другие каналы.</p>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://vk.com/vbh_account_1" class="contact-btn" target="_blank">
+                            VK
+                        </a>
+                        <span class="contact-btn disabled" title="Ссылка появится позже">
+                            МАКС
+                        </span>
+                    </div>
+                    <p style="margin-top: 16px; font-size: 0.8rem; color: #aaa;">
+                        Также ищите нас в соцсетях — ссылки появятся в разделе «Записи».
+                    </p>
+                </div>
+
+                <div class="footer-note">
+                    <p>© iVideo, 2026. Видеохостинг на базе <a href="https://3.ntv.ru">3.ntv.ru</a>.</p>
+                    <p>Платформа в стадии бета-тестирования. Обо всех изменениях сообщаем через соцсети.</p>
+                    <p style="margin-top: 6px;">
+                        <a href="https://3.ntv.ru/public/files/51746313/main_page.html">← Вернуться на главную</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" id="backToTop" title="Наверх" aria-label="Прокрутить наверх">↑</button>
+
+    <script>
+        (function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    if (isOpen) {
+                        item.classList.remove('open');
+                        question.setAttribute('aria-expanded', 'false');
+                    } else {
+                        item.classList.add('open');
+                        question.setAttribute('aria-expanded', 'true');
+                    }
+                });
+                question.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        question.click();
+                    }
+                });
+            });
+
+            const backToTopBtn = document.getElementById('backToTop');
+            function toggleBackToTop() {
+                if (window.scrollY > 500) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            }
+            window.addEventListener('scroll', toggleBackToTop, { passive: true });
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            document.querySelectorAll('.sidebar a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        setTimeout(() => {
+                            window.scrollBy({ top: -80, behavior: 'smooth' });
+                        }, 100);
+                    }
+                });
+            });
+
+            toggleBackToTop();
+        })();
+    </script>
+</body>
+</html>
